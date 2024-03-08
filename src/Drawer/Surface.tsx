@@ -17,6 +17,7 @@ export interface SurfaceProps {
   isCornerSelected: boolean;
   isTableSelected: boolean;
   planImage: File | null;
+  exportFunctionRef: React.MutableRefObject<Function | null>;
 }
 
 const ImageComponent = memo(({ src }: { src: string }) => {
@@ -60,6 +61,22 @@ export function Surface(props: SurfaceProps) {
     }[]
   >([]);
 
+  function exportPlan() {
+    const plan = {
+      items: items,
+      lines: lines.map((line) => ({
+        corner1: line.corner1.id,
+        corner2: line.corner2.id,
+        x1: line.x1,
+        y1: line.y1,
+        x2: line.x2,
+        y2: line.y2,
+      })),
+      image: props.planImage,
+    };
+    return plan;
+  }
+
   useEffect(() => {
     if (corners[0] && corners[1] && corners[0] === corners[1])
       setCorners([null, null]);
@@ -85,6 +102,7 @@ export function Surface(props: SurfaceProps) {
         { corner1: corners[0]!, corner2: corners[1]!, x1, y1, x2, y2 },
       ]);
       setCorners([null, null]);
+      return;
     } else if (corners[0] && corners[1]) {
       setCorners([null, null]);
       setLines((l) =>
@@ -103,6 +121,10 @@ export function Surface(props: SurfaceProps) {
   useEffect(() => {
     rearrangeLines();
   }, [items]);
+
+  useEffect(() => {
+    props.exportFunctionRef.current = exportPlan;
+  }, [items, lines, props.planImage]);
 
   const rearrangeLines = () => {
     setLines((l) =>
@@ -163,6 +185,14 @@ export function Surface(props: SurfaceProps) {
     }
   }
 
+  function unspawnItem(key: string) {
+    setItems((i) => {
+      const updatedItems = { ...i };
+      delete updatedItems[key];
+      return updatedItems;
+    });
+  }
+
   return (
     <div
       ref={drop}
@@ -180,7 +210,17 @@ export function Surface(props: SurfaceProps) {
           type: string;
         };
         if (type == ItemTypes.TABLE) {
-          return <Table key={key} id={key} left={left} top={top} />;
+          return (
+            <Table
+              key={key}
+              id={key}
+              left={left}
+              top={top}
+              onRemove={() => {
+                unspawnItem(key);
+              }}
+            />
+          );
         } else if (type == ItemTypes.CORNER) {
           return (
             <Corner
@@ -190,6 +230,9 @@ export function Surface(props: SurfaceProps) {
               top={top}
               selectCorner={setCorners}
               selectedCorners={corners}
+              onRemove={() => {
+                unspawnItem(key);
+              }}
             />
           );
         }

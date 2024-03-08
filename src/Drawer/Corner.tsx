@@ -10,6 +10,7 @@ export interface CornerInterface {
   selectCorner: React.Dispatch<
     React.SetStateAction<[HTMLElement | null, HTMLElement | null]>
   >;
+  onRemove: () => void;
 }
 
 const CornerStyle: CSSProperties = {
@@ -28,6 +29,7 @@ export const Corner: FC<CornerInterface> = ({
   left,
   selectedCorners,
   selectCorner,
+  onRemove,
 }) => {
   const [{ isDragging }, drag] = useDrag(
     () => ({
@@ -54,6 +56,7 @@ export const Corner: FC<CornerInterface> = ({
 
   return (
     <div
+      id={id}
       ref={drag}
       style={{
         ...CornerStyle,
@@ -61,6 +64,10 @@ export const Corner: FC<CornerInterface> = ({
         left,
       }}
       onClick={onClickCorner}
+      onDoubleClick={(e) => {
+        e.stopPropagation();
+        onRemove();
+      }}
       data-testid="corner"
     ></div>
   );

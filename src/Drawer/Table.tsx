@@ -6,6 +6,7 @@ export interface TableInterface {
   id: string;
   top: number;
   left: number;
+  onRemove: () => void;
 }
 
 const TableStyle: CSSProperties = {
@@ -18,7 +19,7 @@ const TableStyle: CSSProperties = {
   margin: 0,
 };
 
-export const Table: FC<TableInterface> = ({ id, top, left }) => {
+export const Table: FC<TableInterface> = ({ id, top, left, onRemove }) => {
   const [{ isDragging }, drag] = useDrag(
     () => ({
       type: ItemTypes.TABLE,
@@ -36,9 +37,17 @@ export const Table: FC<TableInterface> = ({ id, top, left }) => {
 
   return (
     <div
+      id={id}
       ref={drag}
       style={{ ...TableStyle, top, left }}
       data-testid="table"
+      onClick={(e) => {
+        e.stopPropagation();
+      }}
+      onDoubleClick={(e) => {
+        e.stopPropagation();
+        onRemove();
+      }}
     ></div>
   );
 };
