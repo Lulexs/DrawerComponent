@@ -33,11 +33,13 @@ export default function Drawer() {
             cornerState={[isCornerSelected, setIsCornerSelected]}
             tableState={[isTableSelected, setIsTableSelected]}
           />
-          <input
-            type="file"
-            accept="image/png, image/jpeg"
-            onChange={handleImageChange}
-          />
+          {image === null && (
+            <input
+              type="file"
+              accept="image/png, image/jpeg"
+              onChange={handleImageChange}
+            />
+          )}
           {image != null && (
             <button
               onClick={() => {

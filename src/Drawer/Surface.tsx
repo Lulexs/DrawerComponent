@@ -115,7 +115,6 @@ export function Surface(props: SurfaceProps) {
         )
       );
     }
-    console.log(lines);
   }, [corners]);
 
   useEffect(() => {
